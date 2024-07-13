@@ -1,0 +1,1 @@
+The scripts in this directory are used for comparative genomics analysis, which includes phylogenetic reconstruction, divergence time estimation, positive selection analysis, and gene family contraction and expansion analysis

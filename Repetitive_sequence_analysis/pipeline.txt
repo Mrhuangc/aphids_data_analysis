@@ -1,0 +1,29 @@
+perl cut.pl   #Extract repeat sequence annotation BED file from RepeatMasker results
+
+python stat.RE.py
+
+cut -f 1 MPE.genomic.list4.fasta.out.RE_type.stats | grep "?" -v > MPE.retype.txt
+
+perl re_range.pl MPE.retype.txt      #Extract RE subfamily type list
+
+perl extract_break_points_bed.pl SHE.MPE.blocks.MPE.bed 30000 #Extract breakpoint regions
+
+bedtools intersect -b MPE.genomic.list4.fasta.out -a SHE.MPE.blocks.MPE.30000.bed -wao > SHE.MPE.blocks.MPE.30000.intersect.out
+
+perl stat_breakpoint_windows_re.pl SHE.MPE.blocks.MPE.30000.intersect.out                            #Count the number of each repeat class in the breakpoint regions
+
+perl stat_breakpoint_windows_re_small.pl SHE.MPE.blocks.MPE.30000.intersect.out MPE.retype.txt       #Count the number of each repeat subfamily in the breakpoint regions 
+
+perl produce_section.pl SHE.MPE.blocks.MPE.30000.bed MPE_chr_len.txt 30000 10000 random_windows_10000 #Generate random regions on the chromosome
+
+perl intersect_random_windows.pl random_windows_10000 random_windows_10000_overlap_stat MPE.genomic.list4.fasta.out
+
+ParaFly -c para_run_intersect.random_windows_10000.txt -CPU 80
+
+perl stat_random_windows_re.pl random_windows_10000_overlap_stat random_windows_10000_overlap
+
+perl stat_random_windows_re_small_merge.pl random_windows_10000_overlap_stat MPE.retype.txt.sort random_windows_overlap_small_re.stats
+
+plot_histogram_class.R  #Calculate the p-value for the enrichment of repeat classes in breakpoint regions and generate a plot
+
+compute_pvalue_small.R  #Calculate the p-value for the enrichment of repeat families in breakpoint regions

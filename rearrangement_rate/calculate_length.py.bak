@@ -1,0 +1,52 @@
+# -*- coding: utf-8 -*-
+import sys
+def calculate_total_length(segments):
+    total_length = 0
+    last_end = 0
+
+    for start, end in segments:
+        # 如果当前片段与上一个片段重叠，调整起始位置
+        start = max(start, last_end + 1)
+
+        # 累加当前片段的长度（如果它在上一个片段的结束之后）
+        if start <= end and end > last_end:
+            total_length += end - start + 1
+            #print(start, end, last_end)
+
+        # 更新上一个片段的结束位置
+        last_end = max(last_end, end)
+
+    return total_length
+
+def process_data(data):
+    segments = {}
+    for line in data:
+        parts = line.strip().split('\t')
+        chrom = parts[0]
+        start = int(parts[1])
+        end = int(parts[2])
+
+        if chrom not in segments:
+            segments[chrom] = []
+
+        segments[chrom].append((start, end))
+
+    total_lengths = {}
+    for chrom, segment_list in segments.items():
+        segment_list.sort()  # 按照起始位置排序
+        total_lengths[chrom] = calculate_total_length(segment_list)
+
+    return total_lengths
+
+if __name__ == "__main__":
+    file_path = sys.argv[1]
+
+    with open(file_path, 'r') as file:
+        data = file.readlines()
+
+    total_length = 0
+    chrom_lengths = process_data(data)
+    for chrom, length in sorted(chrom_lengths.items()):
+        total_length += length
+        print("{}: {}".format(chrom, length))
+print("total_length: ",total_length)

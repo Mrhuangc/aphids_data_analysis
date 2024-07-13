@@ -1,0 +1,27 @@
+MCScanX -s 10 -b 2 SMI.API.pep
+
+perl MCScanX_collinearity_2_block_bed.pl SMI.API.pep.collinearity SMI.API.pep.gff
+
+perl rerange.pl SMI.API.pep.collinearity.bed
+
+bedtools sort -i SMI.API.pep.collinearity.bed.rerange.bed > SMI.API.pep.collinearity.bed.rerange.sort.bed
+
+python change_format.py SMI.API.pep.collinearity.bed.rerange.sort.bed
+
+perl get_RE_From_Blocks.pl SMI.API.pep.collinearity.bed.rerange.sort.bed.blocks.txt SMI.API.pep.collinearity.bed.rerange.sort.bed.blocks.txt.sv
+
+cut -f 1-3 SMI.API.pep.collinearity.bed.rerange.sort.bed > SMI.API.pep.collinearity.SMI.bed
+
+cut -f 4-6 SMI.API.pep.collinearity.bed.rerange.sort.bed > SMI.API.pep.collinearity.API.bed
+
+perl rerange_single.pl SMI.API.pep.collinearity.API.bed
+
+bedtools sort -i SMI.API.pep.collinearity.API.bed.rerange.bed > SMI.API.pep.collinearity.API.sort.bed
+
+perl rerange_single.pl SMI.API.pep.collinearity.SMI.bed
+
+bedtools sort -i SMI.API.pep.collinearity.SMI.bed.rerange.bed > SMI.API.pep.collinearity.SMI.sort.bed
+
+python calculate_length.py SMI.API.pep.collinearity.API.sort.bed
+
+python calculate_length.py SMI.API.pep.collinearity.SMI.sort.bed
